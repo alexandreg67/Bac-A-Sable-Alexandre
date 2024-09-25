@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "label": "TypeScript"
+  },
+  {
+    "id": 2,
+    "label": "CSS"
+  },
+  {
+    "id": 3,
+    "label": "JavaScript"
+  },
+  {
+    "id": 4,
+    "label": "HTML"
+  },
+  {
+    "id": 5,
+    "label": "SCSS"
+  }
+]
