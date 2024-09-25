@@ -37,35 +37,21 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
-var child_process_1 = require("child_process");
-function fetchRepos() {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            try {
-                // exec(command, callback);
-                (0, child_process_1.exec)('gh repo list alexandreg67', function (error, stdout, stderr) {
-                    try {
-                        var repos = stdout;
-                        console.log('Liste des repositories :', stdout);
-                        fs.writeFile('raw.json', JSON.stringify(repos, null, 2), function (err) {
-                            if (err) {
-                                console.error("Erreur lors de l'écriture dans le fichier", err);
-                            }
-                            else {
-                                console.log('Les données ont été sauvegardées dans raw.json');
-                            }
-                        });
-                    }
-                    catch (parseError) {
-                        console.error('Erreur lors du parsing de la sortie gh :', parseError);
-                    }
-                });
-            }
-            catch (error) {
-                console.error('Erreur lors de la récupération des repositories :', error);
-            }
-            return [2 /*return*/];
-        });
+(function () { return __awaiter(void 0, void 0, void 0, function () {
+    var raw, repo;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, JSON.parse(fs.readFileSync('./data/raw.json', { encoding: 'utf-8' }))];
+            case 1:
+                raw = _a.sent();
+                repo = raw.map(function (rep) { return ({
+                    id: rep.id,
+                    isPrivate: rep.isPrivate ? 1 : 2,
+                    name: rep.name,
+                    url: rep.url,
+                }); });
+                raw.forEach(function (rep) { });
+                return [2 /*return*/];
+        }
     });
-}
-fetchRepos();
+}); })();
