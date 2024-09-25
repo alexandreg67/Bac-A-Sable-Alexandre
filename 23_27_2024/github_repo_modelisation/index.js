@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -34,21 +35,42 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+var fs = require("fs");
 var GIT_API_URL = 'https://api.github.com/users/alexandreg67/repos';
 console.log('Hello World!');
 function fetchRepos() {
     return __awaiter(this, void 0, void 0, function () {
-        var response, data;
+        var response, repos, reposList, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch(GIT_API_URL)];
+                case 0:
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, fetch(GIT_API_URL)];
                 case 1:
                     response = _a.sent();
                     return [4 /*yield*/, response.json()];
                 case 2:
-                    data = _a.sent();
-                    console.log(data);
-                    return [2 /*return*/, data];
+                    repos = _a.sent();
+                    reposList = repos.map(function (repo) {
+                        return {
+                            name: repo.name, // Nom du repository
+                        };
+                    });
+                    fs.writeFile('repos-data.json', JSON.stringify(reposList, null, 2), function (err) {
+                        if (err) {
+                            console.error("Erreur lors de l'écriture dans le fichier", err);
+                        }
+                        else {
+                            console.log('Les données ont été sauvegardées dans repos-data.json');
+                        }
+                    });
+                    return [2 /*return*/, reposList];
+                case 3:
+                    error_1 = _a.sent();
+                    console.error('Erreur lors de la récupération des repositories :', error_1);
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
             }
         });
     });
