@@ -1,0 +1,46 @@
+# Requête GET pour récupérer tous les dépôts
+GET http://localhost:3000/api/repos
+Accept: application/json
+
+###
+
+# Requête GET pour récupérer un dépôt spécifique (par ID)
+GET http://localhost:3000/api/repos/1
+Accept: application/json
+
+###
+
+# Requête POST pour ajouter un nouveau dépôt
+POST http://localhost:3000/api/repos
+Content-Type: application/json
+
+{
+  "id": "1",
+  "name": "new-repo",
+  "url": "https://github.com/new-repo",
+  "isPrivate": 1
+}
+
+###
+
+# Requête GET pour récupérer toutes les langues
+GET http://localhost:3000/api/langs
+Accept: application/json
+
+###
+
+# Requête GET pour récupérer une langue spécifique (par ID)
+GET http://localhost:3000/api/langs/1
+Accept: application/json
+
+###
+
+# Requête GET pour récupérer tous les statuts
+GET http://localhost:3000/api/status
+Accept: application/json
+
+###
+
+# Requête GET pour récupérer un statut spécifique (par ID)
+GET http://localhost:3000/api/status/1
+Accept: application/json

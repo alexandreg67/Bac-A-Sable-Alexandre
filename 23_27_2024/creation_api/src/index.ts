@@ -1,13 +1,14 @@
 import express from 'express';
-import routerfile from './routerFile';
+import router from './router';
 
 const app = express();
 
+// Middleware pour analyser les requêtes JSON
 app.use(express.json());
 
-app.use('/api', routerfile);
+app.use('/api', router);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-	console.log(`Server running on port ${PORT}`);
+const port = 3000;
+app.listen(port, () => {
+	console.log(`Serveur démarré sur le port ${port}`);
 });
