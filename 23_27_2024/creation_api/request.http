@@ -23,6 +23,23 @@ Content-Type: application/json
 
 ###
 
+
+# Requête PUT pour modifier un dépôt existant
+PUT http://localhost:3000/api/repos/1
+Content-Type: application/json
+
+{
+  "id": "1",
+  "isPrivate": 1,
+  "name": "mon-portfolio-v2",
+  "url": "https://github.com/alexandreg67/mon-portfolio-v2"
+}
+
+###
+
+# Requête DELETE pour supprimer un dépôt existant
+DELETE http://localhost:3000/api/repos/1
+
 # Requête GET pour récupérer toutes les langues
 GET http://localhost:3000/api/langs
 Accept: application/json
