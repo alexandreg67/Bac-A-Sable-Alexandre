@@ -5,10 +5,15 @@ import { Repo } from './repo.type';
 
 const repoControllers = express.Router();
 
+// règles de validation pour le body de la requête
 const schema = Joi.object({
+	// id doit être une chaîne de caractères obligatoire
 	id: Joi.string().required(),
+	// name doit être une chaîne de caractères obligatoire
 	name: Joi.string().required(),
+	// url doit être une chaîne de caractères obligatoire
 	url: Joi.string().required(),
+	// isPrivate doit être un nombre entre 1 et 2
 	isPrivate: Joi.number().min(1).max(2).required(),
 });
 
