@@ -1,11 +1,11 @@
 import express, { Response, Request, NextFunction } from 'express';
-// import repos from '../../data/repos.json';
+import repos from '../../data/repos.json';
 import Joi from 'joi';
 import { Repo } from './repo.type';
 
 const repoControllers = express.Router();
 
-let repos: Repo[] = require('../../data/repos.json');
+// let repos: Repo[] = require('../../data/repos.json');
 
 // règles de validation pour le body de la requête
 const schema = Joi.object({
@@ -32,7 +32,23 @@ const validateRepo = (req: Request, res: Response, next: NextFunction) => {
 	}
 };
 
-repoControllers.get('/', (_: Request, res: Response) => {
+repoControllers.get('/', (req: Request, res: Response) => {
+	const { name, isPrivate } = req.query;
+
+	let filteredRepos = repos as Repo[];
+
+	if (name) {
+		filteredRepos = filteredRepos.filter((repo) =>
+			repo.name.toLowerCase().includes((name as string).toLowerCase())
+		);
+	}
+
+	if (isPrivate) {
+		filteredRepos = filteredRepos.filter(
+			(repo) => repo.isPrivate === parseInt(isPrivate as string, 10)
+		);
+	}
+
 	// on renvoie la liste des repos
 	res.status(200).json(repos);
 });
@@ -76,33 +92,18 @@ repoControllers.put('/:id', validateRepo, (req: Request, res: Response) => {
 
 repoControllers.delete('/:id', (req: Request, res: Response) => {
 	// on cherche le repo dans le tableau en mémoire
-	const repo = repos.find((rep) => rep.id === req.params.id);
+	const repoIndex = (repos as Repo[]).findIndex(
+		(rep) => rep.id === req.params.id
+	);
 
-	if (!repo) {
-		return res.status(404).json({
-			message: `Le repo avec l'id ${req.params.id} n'a pas été trouvé.`,
-		});
+	// repos = repos.filter((rep) => rep.id !== req.params.id);
+
+	if (repoIndex !== -1) {
+		(repos as Repo[]).splice(repoIndex, 1);
+		res.sendStatus(204);
+	} else {
+		res.sendStatus(404);
 	}
-
-	// on cherche le repo dans le tableau en mémoire
-	// const repoIndex = (repos as Repo[]).findIndex(
-	// 	(rep) => rep.id === req.params.id
-	// );
-
-	repos = repos.filter((rep) => rep.id !== req.params.id);
-
-	// if (repoIndex !== -1) {
-	// 	(repos as Repo[]).splice(repoIndex, 1);
-	// 	res.sendStatus(204);
-	// } else {
-	// 	res.sendStatus(404);
-	// }
-
-	res
-		.status(200)
-		.json({
-			message: `Le repo avec l'id ${req.params.id} a été supprimé avec succès.`,
-		});
 });
 
 export default repoControllers;

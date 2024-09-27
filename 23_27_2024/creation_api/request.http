@@ -4,6 +4,12 @@ Accept: application/json
 
 ###
 
+# Requête GET pour récupérer tous les dépôts
+GET http://localhost:3000/api/repos?name=portfolio&isPrivate=1
+Accept: application/json
+
+###
+
 # Requête GET pour récupérer un dépôt spécifique (par ID)
 GET http://localhost:3000/api/repos/1
 Accept: application/json
