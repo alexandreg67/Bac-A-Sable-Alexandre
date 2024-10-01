@@ -5,7 +5,6 @@ import { AppDataSource } from './db/data-source';
 
 const app = express();
 
-// Middleware pour analyser les requêtes JSON
 app.use(express.json());
 
 app.use('/api', router);

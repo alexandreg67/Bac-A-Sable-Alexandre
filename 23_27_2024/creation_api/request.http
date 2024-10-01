@@ -21,10 +21,10 @@ POST http://localhost:3000/api/repos
 Content-Type: application/json
 
 {
-  "id": "1",
+  "id": 2,
   "name": "new-repo",
   "url": "https://github.com/new-repo",
-  "isPrivate": 1
+  "statusId": 2
 }
 
 ###
@@ -36,7 +36,7 @@ Content-Type: application/json
 
 {
   "id": "1",
-  "isPrivate": 1,
+  "statusId": "1",
   "name": "mon-portfolio-v2",
   "url": "https://github.com/alexandreg67/mon-portfolio-v2"
 }
@@ -67,3 +67,16 @@ Accept: application/json
 # Requête GET pour récupérer un statut spécifique (par ID)
 GET http://localhost:3000/api/status/1
 Accept: application/json
+
+###
+
+# Requête POST pour ajouter un nouveau status
+POST http://localhost:3000/api/status
+Content-Type: application/json
+
+{
+  "id": 2,
+  "label": "Privé"
+}
+
+###
