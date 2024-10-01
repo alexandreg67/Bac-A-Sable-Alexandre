@@ -2,17 +2,19 @@ import {
 	BaseEntity,
 	Column,
 	Entity,
+	ManyToMany,
 	ManyToOne,
 	PrimaryGeneratedColumn,
 } from 'typeorm';
 import { IsInt, IsString } from 'class-validator';
 import { Status } from '../status/status.entities';
+import { Lang } from '../langs/lang.entities';
 
 @Entity()
 export class Repo extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	@IsInt()
-	id: number = 1;
+	id!: number;
 
 	@Column()
 	@IsString()
@@ -28,4 +30,7 @@ export class Repo extends BaseEntity {
 
 	@ManyToOne(() => Status, (status) => status.id)
 	status?: Status;
+
+	@ManyToMany(() => Lang, (lang) => lang.repos)
+	langs!: Lang[];
 }

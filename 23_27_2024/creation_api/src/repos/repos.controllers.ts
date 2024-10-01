@@ -2,6 +2,8 @@ import express, { Response, Request } from 'express';
 import { Repo } from './repo.entities';
 import { AppDataSource } from '../db/data-source';
 import { Status } from '../status/status.entities';
+import { Lang } from '../langs/lang.entities';
+import { In } from 'typeorm';
 
 const repoControllers = express.Router();
 
@@ -9,7 +11,7 @@ repoControllers.get('/', async (req: Request, res: Response) => {
 	try {
 		const repoRepository = AppDataSource.getRepository(Repo);
 		const repos = await repoRepository.find({
-			relations: ['status'],
+			relations: ['status', 'langs'],
 		});
 		res.json(repos);
 	} catch (error) {
@@ -44,11 +46,17 @@ repoControllers.get('/:id', async (req: Request, res: Response) => {
 repoControllers.post('/', async (req: Request, res: Response) => {
 	try {
 		const repoRepository = AppDataSource.getRepository(Repo);
+		const langRepository = AppDataSource.getRepository(Lang);
 
 		const newRepo = new Repo();
-		newRepo.id = req.body.id;
+
 		newRepo.name = req.body.name;
 		newRepo.url = req.body.url;
+
+		if (req.body.langIds && Array.isArray(req.body.langIds)) {
+			const langs = await langRepository.findBy({ id: In(req.body.langIds) });
+			newRepo.langs = langs;
+		}
 
 		const status = await AppDataSource.getRepository(Status).findOneByOrFail({
 			id: req.body.statusId,

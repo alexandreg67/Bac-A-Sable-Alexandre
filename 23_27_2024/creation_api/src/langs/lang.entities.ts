@@ -2,14 +2,15 @@ import {
 	BaseEntity,
 	Column,
 	Entity,
-	OneToMany,
+	JoinTable,
+	ManyToMany,
 	PrimaryGeneratedColumn,
 } from 'typeorm';
 import { IsString } from 'class-validator';
 import { Repo } from '../repos/repo.entities';
 
 @Entity()
-export class Status extends BaseEntity {
+export class Lang extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id!: number;
 
@@ -17,6 +18,7 @@ export class Status extends BaseEntity {
 	@IsString()
 	label: string = '';
 
-	@OneToMany(() => Repo, (repo) => repo.status)
+	@ManyToMany(() => Repo, (repo) => repo.langs)
+	@JoinTable()
 	repos?: Repo[];
 }

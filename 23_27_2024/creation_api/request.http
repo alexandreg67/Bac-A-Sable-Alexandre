@@ -21,10 +21,10 @@ POST http://localhost:3000/api/repos
 Content-Type: application/json
 
 {
-  "id": 2,
   "name": "new-repo",
   "url": "https://github.com/new-repo",
-  "statusId": 2
+  "statusId": 1,
+  "langIds": [1, 2, 3]  
 }
 
 ###
@@ -75,8 +75,16 @@ POST http://localhost:3000/api/status
 Content-Type: application/json
 
 {
-  "id": 2,
-  "label": "Privé"
+  "label": "Public"
+}
+
+###
+# Requête POST pour ajouter un nouveau language
+POST http://localhost:3000/api/langs
+Content-Type: application/json
+
+{
+  "label": "C#"
 }
 
 ###
