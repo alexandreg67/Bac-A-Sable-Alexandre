@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "fetch": "gh repo list alexandreg67 --json id,name,url,languages,isPrivate > ./data/raw.json",
-    "create": "ts-node-dev ./data/create.ts",
+    "fetch": "gh repo list alexandreg67 --json id,name,url,languages,isPrivate > ./src/data/raw.json",
+    "create": "ts-node-dev ./src/data/create.ts",
     "dev": "ts-node ./src/index.ts"
   },
   "keywords": [],

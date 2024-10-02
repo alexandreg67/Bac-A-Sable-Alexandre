@@ -45,28 +45,23 @@ repoControllers.get('/:id', async (req: Request, res: Response) => {
 
 repoControllers.post('/', async (req: Request, res: Response) => {
 	try {
-		const repoRepository = AppDataSource.getRepository(Repo);
-		const langRepository = AppDataSource.getRepository(Lang);
+		const repo = new Repo();
 
-		const newRepo = new Repo();
+		repo.name = req.body.name;
+		repo.url = req.body.url;
 
-		newRepo.name = req.body.name;
-		newRepo.url = req.body.url;
-
-		if (req.body.langIds && Array.isArray(req.body.langIds)) {
-			const langs = await langRepository.findBy({ id: In(req.body.langIds) });
-			newRepo.langs = langs;
-		}
-
-		const status = await AppDataSource.getRepository(Status).findOneByOrFail({
-			id: req.body.statusId,
+		const langs = await Lang.find({
+			where: { id: In(req.body.langs.map((l: number) => l)) },
 		});
 
-		newRepo.status = status;
+		const status = await Lang.findOneByOrFail({
+			id: req.body.statusId,
+		});
+		repo.status = status;
 
-		const savedRepo = await repoRepository.save(newRepo);
+		await repo.save();
 
-		res.status(201).json(savedRepo);
+		res.status(201).json(repo);
 	} catch (error) {
 		console.error('Erreur lors de la création du repo :', error);
 		res.status(500).json({ message: 'Erreur lors de la création du repo.' });
