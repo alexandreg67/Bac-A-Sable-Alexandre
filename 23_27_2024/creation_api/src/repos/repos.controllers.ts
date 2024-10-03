@@ -8,22 +8,30 @@ import { Status } from '../status/status.entities';
 const repoControllers = express.Router();
 
 repoControllers.get('/', async (req: Request, res: Response) => {
-	const { lang } = req.query;
-
-	let query = AppDataSource.getRepository(Repo).createQueryBuilder('repo');
-
-	if (lang) {
-		console.log(`Filtrage par langage : ${lang}`);
-		query = query.where('langs.label = :lang', { lang });
-	} else {
-		console.log('Aucun filtre de langage appliqué');
-	}
+	// Récupération du paramètre de requête lang
+	const { langs } = req.query;
 
 	try {
-		const repoRepository = AppDataSource.getRepository(Repo);
-		const repos = await repoRepository.find({
-			relations: ['status', 'langs'],
-		});
+		// Construction de la requête avec jointure sur les relations
+		let query = AppDataSource.getRepository(Repo)
+			.createQueryBuilder('repo')
+			.leftJoinAndSelect('repo.status', 'status') // Jointure avec le statut
+			.innerJoinAndSelect('repo.langs', 'langs'); // Jointure avec les langues
+
+		// Si une langue est spécifiée, on applique le filtre
+		if (langs) {
+			const langsArray = typeof langs === 'string' ? langs.split(',') : langs; // Convertir en tableau si c'est une chaîne séparée par des virgules
+			console.log(`Filtrage par langues : ${langsArray}`);
+
+			// On utilise IN pour vérifier que le label de langue est dans la liste des langues spécifiées
+			query = query.where('langs.label IN (:...langsArray)', { langsArray });
+		} else {
+			// Sinon, on ne filtre pas par langue
+			console.log('Pas de filtre par langue');
+		}
+
+		// Exécution de la requête
+		const repos = await query.getMany(); // Utilisation de getMany() pour exécuter la requête
 		res.json(repos);
 	} catch (error) {
 		console.error('Erreur lors de la récupération des repos :', error);

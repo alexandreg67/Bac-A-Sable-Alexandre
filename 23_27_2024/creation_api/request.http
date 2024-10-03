@@ -1,4 +1,10 @@
-# Requête GET pour récupérer tous les dépôts
+# Requête GET pour récupérer tous les dépôts (avec filtres par language)
+GET http://localhost:3000/api/repos?langs=JavaScript,TypeScript
+Accept: application/json
+
+###
+
+# Requête GET pour récupérer tous les dépôts (sans filtres par language)
 GET http://localhost:3000/api/repos
 Accept: application/json
 
