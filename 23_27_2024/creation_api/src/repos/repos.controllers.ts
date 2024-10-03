@@ -1,13 +1,24 @@
 import express, { Response, Request } from 'express';
 import { Repo } from './repo.entities';
 import { AppDataSource } from '../db/data-source';
-import { Status } from '../status/status.entities';
 import { Lang } from '../langs/lang.entities';
 import { In } from 'typeorm';
+import { Status } from '../status/status.entities';
 
 const repoControllers = express.Router();
 
 repoControllers.get('/', async (req: Request, res: Response) => {
+	const { lang } = req.query;
+
+	let query = AppDataSource.getRepository(Repo).createQueryBuilder('repo');
+
+	if (lang) {
+		console.log(`Filtrage par langage : ${lang}`);
+		query = query.where('langs.label = :lang', { lang });
+	} else {
+		console.log('Aucun filtre de langage appliqué');
+	}
+
 	try {
 		const repoRepository = AppDataSource.getRepository(Repo);
 		const repos = await repoRepository.find({
@@ -26,7 +37,7 @@ repoControllers.get('/:id', async (req: Request, res: Response) => {
 	try {
 		const repoRepository = AppDataSource.getRepository(Repo);
 		const repo = await repoRepository.findOne({
-			where: { id: parseInt(req.params.id) },
+			where: { id: req.params.id },
 			relations: ['status'],
 		});
 
@@ -45,19 +56,35 @@ repoControllers.get('/:id', async (req: Request, res: Response) => {
 
 repoControllers.post('/', async (req: Request, res: Response) => {
 	try {
-		const repo = new Repo();
+		const { name, url, statusId, langIds } = req.body;
 
-		repo.name = req.body.name;
-		repo.url = req.body.url;
+		if (!name || !url || !statusId || !Array.isArray(langIds)) {
+			return res
+				.status(400)
+				.json({ message: 'Des informations sont manquantes ou incorrectes.' });
+		}
+
+		const repo = new Repo();
+		repo.name = name;
+		repo.url = url;
+
+		const status = await Status.findOneBy({ id: statusId });
+		if (!status) {
+			return res.status(400).json({ message: 'Statut invalide.' });
+		}
+		repo.status = status;
 
 		const langs = await Lang.find({
-			where: { id: In(req.body.langs.map((l: number) => l)) },
+			where: { id: In(langIds) },
 		});
 
-		const status = await Lang.findOneByOrFail({
-			id: req.body.statusId,
-		});
-		repo.status = status;
+		if (!langs || langs.length === 0) {
+			return res
+				.status(400)
+				.json({ message: 'Langues invalides ou non trouvées.' });
+		}
+
+		repo.langs = langs;
 
 		await repo.save();
 
@@ -70,20 +97,49 @@ repoControllers.post('/', async (req: Request, res: Response) => {
 
 repoControllers.put('/:id', async (req: Request, res: Response) => {
 	try {
+		const { name, url, statusId, langIds } = req.body;
+
 		const repoRepository = AppDataSource.getRepository(Repo);
-		const repo = await repoRepository.findOneBy({
-			id: parseInt(req.params.id),
+		const repo = await repoRepository.findOne({
+			where: { id: req.params.id },
+			relations: ['status', 'langs'],
 		});
 
 		if (!repo) {
 			return res.status(404).json({ message: 'Repo non trouvé' });
 		}
-		repo.name = req.body.name || repo.name;
-		repo.url = req.body.url || repo.url;
-		repo.status =
-			req.body.isPrivate !== undefined ? req.body.isPrivate : repo.status;
+
+		console.log('Repo avant modification:', repo);
+
+		repo.name = name || repo.name;
+		repo.url = url || repo.url;
+
+		if (statusId) {
+			console.log('StatusID envoyé:', statusId);
+			const status = await Status.findOneBy({ id: statusId });
+			if (!status) {
+				return res.status(400).json({ message: 'Statut invalide.' });
+			}
+			repo.status = status;
+			console.log('Nouveau statut:', status);
+		}
+
+		if (Array.isArray(langIds) && langIds.length > 0) {
+			console.log('Langues envoyées:', langIds);
+			const langs = await Lang.find({
+				where: { id: In(langIds) },
+			});
+			if (!langs || langs.length === 0) {
+				return res
+					.status(400)
+					.json({ message: 'Langues invalides ou non trouvées.' });
+			}
+			repo.langs = langs;
+			console.log('Nouvelles langues:', langs);
+		}
 
 		const updatedRepo = await repoRepository.save(repo);
+		console.log('Repo après modification:', updatedRepo);
 		res.json(updatedRepo);
 	} catch (error) {
 		console.error('Erreur lors de la mise à jour du repo :', error);
@@ -95,7 +151,7 @@ repoControllers.delete('/:id', async (req: Request, res: Response) => {
 	try {
 		const repoRepository = AppDataSource.getRepository(Repo);
 		const repo = await repoRepository.findOneBy({
-			id: parseInt(req.params.id),
+			id: req.params.id,
 		});
 
 		if (!repo) {

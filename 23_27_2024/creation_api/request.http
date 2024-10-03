@@ -11,7 +11,7 @@ Accept: application/json
 ###
 
 # Requête GET pour récupérer un dépôt spécifique (par ID)
-GET http://localhost:3000/api/repos/2
+GET http://localhost:3000/api/repos/8ea6da82-bf77-4726-a6f2-5669c461fd61
 Accept: application/json
 
 ###
@@ -21,7 +21,7 @@ POST http://localhost:3000/api/repos
 Content-Type: application/json
 
 {
-  "name": "new-repo",
+  "name": "repo de test",
   "url": "https://github.com/new-repo",
   "statusId": 1,
   "langIds": [1, 2, 3]  
@@ -31,20 +31,19 @@ Content-Type: application/json
 
 
 # Requête PUT pour modifier un dépôt existant
-PUT http://localhost:3000/api/repos/1
+PUT http://localhost:3000/api/repos/8ea6da82-bf77-4726-a6f2-5669c461fd61
 Content-Type: application/json
 
 {
-  "id": "1",
   "statusId": "1",
-  "name": "mon-portfolio-v2",
+  "name": "mon-portfolio-v4",
   "url": "https://github.com/alexandreg67/mon-portfolio-v2"
 }
 
 ###
 
 # Requête DELETE pour supprimer un dépôt existant
-DELETE http://localhost:3000/api/repos/1
+DELETE http://localhost:3000/api/repos/8ea6da82-bf77-4726-a6f2-5669c461fd61
 
 # Requête GET pour récupérer toutes les langues
 GET http://localhost:3000/api/langs
@@ -52,39 +51,4 @@ Accept: application/json
 
 ###
 
-# Requête GET pour récupérer une langue spécifique (par ID)
-GET http://localhost:3000/api/langs/1
-Accept: application/json
 
-###
-
-# Requête GET pour récupérer tous les statuts
-GET http://localhost:3000/api/status
-Accept: application/json
-
-###
-
-# Requête GET pour récupérer un statut spécifique (par ID)
-GET http://localhost:3000/api/status/1
-Accept: application/json
-
-###
-
-# Requête POST pour ajouter un nouveau status
-POST http://localhost:3000/api/status
-Content-Type: application/json
-
-{
-  "label": "Public"
-}
-
-###
-# Requête POST pour ajouter un nouveau language
-POST http://localhost:3000/api/langs
-Content-Type: application/json
-
-{
-  "label": "C#"
-}
-
-###

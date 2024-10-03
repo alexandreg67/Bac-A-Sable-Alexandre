@@ -4,6 +4,7 @@ import {
 	Entity,
 	ManyToMany,
 	ManyToOne,
+	PrimaryColumn,
 	PrimaryGeneratedColumn,
 } from 'typeorm';
 import { IsInt, IsString } from 'class-validator';
@@ -12,13 +13,8 @@ import { Lang } from '../langs/lang.entities';
 
 @Entity()
 export class Repo extends BaseEntity {
-	@PrimaryGeneratedColumn()
-	@IsInt()
-	id!: number;
-
-	@Column()
-	@IsString()
-	githubKey: string = '';
+	@PrimaryColumn('uuid')
+	id!: string;
 
 	@Column()
 	@IsString()
