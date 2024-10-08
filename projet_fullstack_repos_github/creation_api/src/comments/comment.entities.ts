@@ -12,6 +12,6 @@ export class Comment {
 	@Column()
 	createdAt!: Date;
 
-	@ManyToOne(() => Repo, (repo) => repo.comments)
-	repo!: Repo;
+	// @ManyToOne(() => Repo, (repo) => repo.comments)
+	// repo!: Repo;
 }
