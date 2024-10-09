@@ -6,6 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "fetch": "gh repo list alexandreg67 --json id,name,url,languages,isPrivate > ./src/data/raw.json && echo \"Data fetched\"",
     "create": "ts-node-dev src/data/create.ts",
+    "clean-cache-start": "npm cache clean --force && ts-node ./src/index.ts",
     "dev": "ts-node ./src/index.ts",
     "seed": "ts-node ./src/db/seed.ts",
     "full": "gh repo list alexandreg67 --json id,name,url,languages,isPrivate > ./src/data/raw.json && echo \"Data fetched\" && ts-node-dev src/data/create.ts && ts-node ./src/db/seed.ts"

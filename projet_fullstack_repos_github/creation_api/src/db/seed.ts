@@ -27,9 +27,11 @@ import lang_by_repo from '../data/lang_by_repo.json';
 		console.log('Table repo vidée');
 		await queryRunner.query('DELETE FROM status');
 		console.log('Table status vidée');
+		await queryRunner.query('DELETE FROM comment');
+		console.log('Table comment vidée');
 
 		await queryRunner.query(
-			'DELETE FROM sqlite_sequence WHERE name = "status" OR name = "lang" OR name = "repo"'
+			'DELETE FROM sqlite_sequence WHERE name = "status" OR name = "lang" OR name = "repo" OR name = "comment"'
 		);
 		console.log('Base de données vidées');
 

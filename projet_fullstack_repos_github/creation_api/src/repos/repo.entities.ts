@@ -6,7 +6,7 @@ import {
 	ManyToMany,
 	ManyToOne,
 	OneToMany,
-	PrimaryColumn,
+	PrimaryGeneratedColumn,
 } from 'typeorm';
 import { IsString } from 'class-validator';
 import { Status } from '../status/status.entities';
@@ -18,7 +18,7 @@ import { Comment } from '../comments/comment.entities';
 @Entity()
 export class Repo extends BaseEntity {
 	@Field() // Déclare que le champ `id` doit être exposé dans le schéma GraphQL
-	@PrimaryColumn('uuid')
+	@PrimaryGeneratedColumn('uuid')
 	id!: string;
 
 	@Field()
@@ -32,15 +32,15 @@ export class Repo extends BaseEntity {
 	url: string = '';
 
 	// Relation avec Status (un repo a un statut)
-	@Field(() => Status) // Indique que `status` est un objet `Status`
+	@Field(() => Status)
 	@ManyToOne(() => Status, (status) => status.id)
-	status?: Status;
+	status!: Status;
 
 	@Field(() => [Lang]) // Relation avec les langues
 	@ManyToMany(() => Lang, (lang) => lang.repos)
 	langs!: Lang[];
 
-	// @Field(() => [Comment])
-	// @OneToMany(() => Comment, (comment) => comment.repo)
-	// comments!: Comment[];
+	@Field(() => [Comment], { nullable: true }) // Relation avec les commentaires
+	@OneToMany(() => Comment, (comment) => comment.repo, { cascade: true })
+	comments!: Comment[];
 }
