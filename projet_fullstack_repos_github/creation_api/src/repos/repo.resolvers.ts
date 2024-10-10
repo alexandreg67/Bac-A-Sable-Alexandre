@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg } from 'type-graphql';
+import { Resolver, Query, Mutation, Arg, Int } from 'type-graphql';
 import { Repo } from './repo.entities';
 import { Status } from '../status/status.entities';
 import { Lang } from '../langs/lang.entities';
@@ -12,31 +12,22 @@ export class RepoResolver {
 	// Requête pour obtenir la liste des repos
 	@Query(() => [Repo])
 	async repos(
-		// Utilisation des arguments pour filtrer les repos par langues et statuts
-		@Arg('langs', () => [String], { nullable: true }) langs?: string[],
+		@Arg('langs', () => [Int], { nullable: true }) langs?: number[],
 		@Arg('status', { nullable: true }) status?: string
 	): Promise<Repo[]> {
-		// Si des langues ou un statut sont fournis, on les utilise pour filtrer les repos
+		const query = Repo.createQueryBuilder('repo')
+			.leftJoinAndSelect('repo.status', 'status')
+			.leftJoinAndSelect('repo.langs', 'langs');
+
+		if (langs && langs.length > 0) {
+			query.andWhere('langs.id IN (:...langs)', { langs });
+		}
+
 		if (status) {
-			// Utilisation de QueryBuilder pour gérer les filtres sur les statuts
-			const query = Repo.createQueryBuilder('repo').leftJoinAndSelect(
-				'repo.status',
-				'status'
-			);
-			return await query.getMany();
+			query.andWhere('status.label = :status', { status });
 		}
 
-		if (langs) {
-			// Utilisation de QueryBuilder pour gérer les filtres sur les langues
-			const query = Repo.createQueryBuilder('repo')
-				.leftJoinAndSelect('repo.langs', 'langs')
-				.where('langs.name IN (:...langs)', { langs });
-			return await query.getMany();
-		}
-
-		return await Repo.find({
-			relations: ['status', 'langs', 'comments'],
-		});
+		return await query.getMany();
 	}
 
 	// Requête pour obtenir un repo spécifique par ID
