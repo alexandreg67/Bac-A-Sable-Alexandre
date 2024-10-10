@@ -1,49 +1,67 @@
-import { useLoaderData } from 'react-router-dom';
-import { Repo } from './types/repoTypes';
+import React, { useEffect, useState } from 'react';
 import RepoCard from './components/RepoCard';
 import FilterRepos from './components/FilterRepos';
-import FilterStatus from './components/FilterStatus';
-import { useState } from 'react';
+import { useQuery } from '@apollo/client';
+import { GetAllRepos } from './services/api';
+import { Lang, Repo } from './types/repoTypes';
 
 const App: React.FC = () => {
-	// Récupérer les données du loader
-	const { repos, availableLangs } = useLoaderData() as {
-		repos: Repo[];
-		availableLangs: string[];
-	};
+	// Langages sélectionnés
+	const [selectedLangs, setSelectedLangs] = useState<number[]>([]);
 
-	const [filteredRepos, setFilteredRepos] = useState<Repo[]>(repos); // repos filtrés
-	const [selectedLangs, setSelectedLangs] = useState<string[]>([]); // Langages sélectionnés
-	const [selectedStatus, setSelectedStatus] = useState<string | null>(null); // Statut sélectionné
+	const [availableLangs, setAvailableLangs] = useState<Lang[]>([]);
 
-	// Appliquer les filtres de langue et de statut
-	const applyFilters = async (langs: string[], status: string | null) => {
-		// Filtrer les dépôts en fonction des langues et du statut sélectionnés
-		const filtered = repos.filter((repo) => {
-			const matchesLangs =
-				langs.length === 0 ||
-				repo.langs.some((lang) => langs.includes(lang.label));
-			const matchesStatus = status === null || repo.status.label === status;
-			return matchesLangs && matchesStatus;
-		});
-		setFilteredRepos(filtered);
-	};
+	console.log('Variables envoyées à la requête:', {
+		langs: selectedLangs.length > 0 ? selectedLangs : null,
+		// status: selectedStatus || null,
+	});
 
-	// Gestion du changement de langage
-	const handleLanguageChange = (lang: string, checked: boolean) => {
+	// Requête GraphQL pour récupérer les repos en fonction des langages sélectionnés
+	const { loading, error, data, refetch } = useQuery(GetAllRepos, {
+		variables: {
+			langs: selectedLangs.length > 0 ? selectedLangs : null, // Utilisation d'un tableau d'entiers ou null
+			// status: selectedStatus || null, // Chaîne ou null
+		},
+	});
+
+	// Une fois les repos récupérés, met à jour la liste des langages
+	useEffect(() => {
+		if (data?.repos) {
+			const allLangs = Array.from(
+				new Set(
+					data.repos.flatMap((repo: Repo) =>
+						repo.langs.map((lang: Lang) => lang)
+					)
+				)
+			);
+
+			// Mets à jour les langages disponibles seulement si ce n'est pas déjà fait
+			if (availableLangs.length === 0) {
+				setAvailableLangs(allLangs as Lang[]);
+			}
+		}
+	}, [data, availableLangs]);
+
+	// Fonction appelée lorsque l'utilisateur sélectionne ou désélectionne un langage
+	const handleLanguageChange = (langId: number, checked: boolean) => {
 		const newSelectedLangs = checked
-			? [...selectedLangs, lang] // Ajouter un langage
-			: selectedLangs.filter((selectedLang) => selectedLang !== lang); // Retirer un langage
+			? [...selectedLangs, langId] // Ajouter l'ID sélectionné
+			: selectedLangs.filter((id) => id !== langId); // Retirer l'ID si décoché
 
-		setSelectedLangs(newSelectedLangs); // Mettre à jour les langages sélectionnées
-		applyFilters(newSelectedLangs, selectedStatus); // Appliquer les filtres
+		setSelectedLangs(newSelectedLangs);
+
+		console.log('Langages sélectionnés:', newSelectedLangs);
+
+		// Refetch les repos en fonction des nouveaux langages sélectionnés
+		refetch({
+			langs: newSelectedLangs.length > 0 ? newSelectedLangs : null,
+		});
 	};
 
-	// Gestion du changement de statut
-	const handleStatusChange = (status: string | null) => {
-		setSelectedStatus(status); // Mettre à jour le statut
-		applyFilters(selectedLangs, status); // Appliquer les filtres
-	};
+	if (loading) return <p>Chargement...</p>;
+	if (error) return <p>Erreur : {error.message}</p>;
+
+	const repos: Repo[] = data?.repos || [];
 
 	return (
 		<div className="container mx-auto p-6">
@@ -52,21 +70,16 @@ const App: React.FC = () => {
 			</h1>
 
 			<FilterRepos
-				availableLangs={availableLangs} // Liste des langages
-				selectedLangs={selectedLangs} // Langages sélectionnés
-				onLanguageChange={handleLanguageChange} // Gestion des changements de langages
+				availableLangs={availableLangs} // Transmettre les langages uniques
+				selectedLangs={selectedLangs} // Transmettre les langages sélectionnés
+				onLanguageChange={handleLanguageChange} // Gérer les changements de sélection
 			/>
 
-			<FilterStatus
-				selectedStatus={selectedStatus} // Statut sélectionné
-				onStatusChange={handleStatusChange} // Gestion des changements de statut
-			/>
-
-			{filteredRepos.length === 0 ? (
+			{repos.length === 0 ? (
 				<p className="text-center text-lg">Aucun repo trouvé.</p>
 			) : (
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{filteredRepos.map((repo) => (
+					{repos.map((repo) => (
 						<RepoCard key={repo.id} repo={repo} />
 					))}
 				</div>

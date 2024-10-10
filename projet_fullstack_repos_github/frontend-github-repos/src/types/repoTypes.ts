@@ -7,3 +7,8 @@ export interface Repo {
 	langs: { id: number; label: string }[];
 	comments?: Comment[];
 }
+
+export interface Lang {
+	id: number;
+	label: string;
+}

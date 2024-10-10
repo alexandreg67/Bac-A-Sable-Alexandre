@@ -14,7 +14,7 @@ const RepoCard: React.FC<RepoCardProps> = ({ repo }) => {
 					<strong>Statut:</strong> {repo.status.label}
 				</p>
 				<p className="text-gray-600">
-					<strong>Langues:</strong>{' '}
+					<strong>Langages:</strong>{' '}
 					{repo.langs.map((lang) => lang.label).join(', ')}
 				</p>
 				<div className="card-actions justify-end">

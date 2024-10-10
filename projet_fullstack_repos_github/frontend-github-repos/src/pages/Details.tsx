@@ -1,95 +1,78 @@
-import { useLoaderData } from 'react-router-dom';
+import { GetRepoDetails } from '../services/api';
+import { useQuery } from '@apollo/client';
+import { useParams, Link } from 'react-router-dom';
 import { Repo } from '../types/repoTypes';
-import { useState } from 'react';
-import { postComment } from '../services/api';
 
 const Details: React.FC = () => {
-	// Récupérer les données du loader
-	const { repo, comments: initialComments } = useLoaderData() as {
-		repo: Repo;
-		comments: Comment[];
-	};
+	const { id } = useParams<{ id: string }>(); // Récupère l'id du repo à partir de l'URL
+	const { loading, error, data } = useQuery(GetRepoDetails, {
+		variables: { id },
+	});
 
-	// État local pour gérer les commentaires
-	const [comments, setComments] = useState<Comment[]>(initialComments);
-	const [newComment, setNewComment] = useState<string>('');
+	// Vérifie si la requête est en cours ou a échoué
+	if (loading) return <p>Chargement...</p>;
+	if (error) return <p>Erreur lors du chargement des détails du dépôt.</p>;
 
-	// Gérer la soumission d'un nouveau commentaire
-	const handleCommentSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!newComment.trim()) return;
-
-		try {
-			// Poster le commentaire
-			await postComment(repo.id, newComment);
-			// Réinitialiser le champ de commentaire
-			setNewComment('');
-			// Mettre à jour les commentaires en rechargeant ou en ajoutant localement
-			const updatedComments = [
-				...comments,
-				{
-					id: Date.now(),
-					content: newComment,
-					createdAt: new Date().toISOString(),
-				},
-			];
-			setComments(updatedComments);
-		} catch (error) {
-			console.error("Erreur lors de l'ajout du commentaire", error);
-		}
-	};
+	// Récupérer les détails du repo et les commentaires
+	const repo: Repo = data.repo;
 
 	return (
-		<div className="container mx-auto p-6">
-			<h1 className="text-4xl font-bold mb-4">{repo.name}</h1>
-			<p>
-				<strong>Statut :</strong> {repo.status.label}
+		<div className="container mx-auto p-6 max-w-3xl">
+			{/* Bouton pour revenir à la liste des repos */}
+			<Link
+				to="/"
+				className="text-blue-500 hover:text-blue-700 mb-6 inline-block"
+			>
+				← Retour à la liste des dépôts
+			</Link>
+
+			{/* Titre du repo */}
+			<h1 className="text-5xl font-bold mb-6 text-primary">{repo.name}</h1>
+
+			{/* Statut */}
+			<p className="text-lg mb-4">
+				<strong>Statut :</strong>{' '}
+				<span className="badge badge-primary badge-lg">
+					{repo.status.label}
+				</span>
 			</p>
-			<p>
-				<strong>Langues :</strong>{' '}
-				{repo.langs.map((lang) => lang.label).join(', ')}
-			</p>
-			<p>
+
+			{/* Langages */}
+			<div className="mb-6">
+				<strong>Langages :</strong>
+				{repo.langs.length > 0 ? (
+					<div className="flex space-x-2 mt-2">
+						{repo.langs.map((lang) => (
+							<span key={lang.label} className="badge badge-info">
+								{lang.label}
+							</span>
+						))}
+					</div>
+				) : (
+					<p className="text-gray-500">
+						Aucun langage disponible pour ce dépôt.
+					</p>
+				)}
+			</div>
+
+			{/* URL du repo */}
+			<p className="mb-6">
 				<strong>URL :</strong>{' '}
 				<a
 					href={repo.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="text-blue-500"
+					className="text-blue-500 hover:underline"
 				>
 					Voir sur GitHub
 				</a>
 			</p>
 
-			{/* Section des commentaires */}
+			{/* Formulaire pour ajouter un commentaire (esthétique, logique à implémenter plus tard) */}
 			<div className="mt-8">
-				<h2 className="text-2xl font-semibold mb-4">Commentaires</h2>
-				{comments.length > 0 ? (
-					<div className="space-y-4">
-						{comments.map((comment) => (
-							<div
-								key={comment.id}
-								className="p-4 bg-gray-100 rounded-lg shadow-sm"
-							>
-								<p>{comment.content}</p>
-								<small className="text-gray-500">
-									{new Date(comment.createdAt).toLocaleString()}
-								</small>
-							</div>
-						))}
-					</div>
-				) : (
-					<p>Aucun commentaire pour ce dépôt.</p>
-				)}
-			</div>
-
-			{/* Formulaire d'ajout de commentaire */}
-			<div className="mt-8">
-				<h3 className="text-xl font-semibold mb-4">Ajouter un commentaire</h3>
-				<form onSubmit={handleCommentSubmit} className="space-y-4">
+				<h3 className="text-2xl font-semibold mb-4">Ajouter un commentaire</h3>
+				<form className="space-y-4">
 					<textarea
-						value={newComment}
-						onChange={(e) => setNewComment(e.target.value)}
 						placeholder="Écrire un commentaire"
 						className="textarea textarea-bordered w-full"
 					/>
