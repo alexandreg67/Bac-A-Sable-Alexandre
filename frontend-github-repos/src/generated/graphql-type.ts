@@ -87,6 +87,13 @@ export type GetReposQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetReposQuery = { __typename?: 'Query', repos: Array<{ __typename?: 'Repo', id: string, name: string, url: string, isPrivate: boolean, status: { __typename?: 'Status', id: number, label: string }, langs: Array<{ __typename?: 'Lang', id: number, label: string }> }> };
 
+export type GetRepoDetailsQueryVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type GetRepoDetailsQuery = { __typename?: 'Query', repo: { __typename?: 'Repo', id: string, name: string, url: string, isPrivate: boolean, status: { __typename?: 'Status', id: number, label: string }, langs: Array<{ __typename?: 'Lang', id: number, label: string }> } };
+
 
 export const GetReposDocument = gql`
     query GetRepos {
@@ -138,3 +145,54 @@ export type GetReposQueryHookResult = ReturnType<typeof useGetReposQuery>;
 export type GetReposLazyQueryHookResult = ReturnType<typeof useGetReposLazyQuery>;
 export type GetReposSuspenseQueryHookResult = ReturnType<typeof useGetReposSuspenseQuery>;
 export type GetReposQueryResult = Apollo.QueryResult<GetReposQuery, GetReposQueryVariables>;
+export const GetRepoDetailsDocument = gql`
+    query GetRepoDetails($id: String!) {
+  repo(id: $id) {
+    id
+    name
+    url
+    isPrivate
+    status {
+      id
+      label
+    }
+    langs {
+      id
+      label
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetRepoDetailsQuery__
+ *
+ * To run a query within a React component, call `useGetRepoDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetRepoDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetRepoDetailsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetRepoDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetRepoDetailsQuery, GetRepoDetailsQueryVariables> & ({ variables: GetRepoDetailsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetRepoDetailsQuery, GetRepoDetailsQueryVariables>(GetRepoDetailsDocument, options);
+      }
+export function useGetRepoDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetRepoDetailsQuery, GetRepoDetailsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetRepoDetailsQuery, GetRepoDetailsQueryVariables>(GetRepoDetailsDocument, options);
+        }
+export function useGetRepoDetailsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetRepoDetailsQuery, GetRepoDetailsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetRepoDetailsQuery, GetRepoDetailsQueryVariables>(GetRepoDetailsDocument, options);
+        }
+export type GetRepoDetailsQueryHookResult = ReturnType<typeof useGetRepoDetailsQuery>;
+export type GetRepoDetailsLazyQueryHookResult = ReturnType<typeof useGetRepoDetailsLazyQuery>;
+export type GetRepoDetailsSuspenseQueryHookResult = ReturnType<typeof useGetRepoDetailsSuspenseQuery>;
+export type GetRepoDetailsQueryResult = Apollo.QueryResult<GetRepoDetailsQuery, GetRepoDetailsQueryVariables>;

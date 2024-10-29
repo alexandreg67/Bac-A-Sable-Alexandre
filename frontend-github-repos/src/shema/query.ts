@@ -18,3 +18,22 @@ export const GET_REPOS = gql`
     }
   }
 `;
+
+export const GET_REPO_DETAILS = gql`
+  query GetRepoDetails($id: String!) {
+    repo(id: $id) {
+      id
+      name
+      url
+      isPrivate
+      status {
+        id
+        label
+      }
+      langs {
+        id
+        label
+      }
+    }
+  }
+`;
