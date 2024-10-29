@@ -1,0 +1,66 @@
+# Requête GET pour récupérer tous les dépôts (avec filtres par language)
+GET http://localhost:3000/api/repos?langs=JavaScript,TypeScript
+Accept: application/json
+
+###
+
+# Requête GET pour récupérer tous les dépôts (avec filtres par language et par status)
+GET http://localhost:3000/api/repos?langs=TypeScript,JavaScript&status=Privé
+Accept: application/json
+
+###
+
+# Requête GET pour récupérer tous les dépôts (sans filtres par language)
+GET http://localhost:3000/api/repos
+Accept: application/json
+
+###
+
+# Requête GET pour récupérer tous les dépôts
+GET http://localhost:3000/api/repos?name=portfolio&isPrivate=1
+Accept: application/json
+
+###
+
+# Requête GET pour récupérer un dépôt spécifique (par ID)
+GET http://localhost:3000/api/repos/8ea6da82-bf77-4726-a6f2-5669c461fd61
+Accept: application/json
+
+###
+
+# Requête POST pour ajouter un nouveau dépôt
+POST http://localhost:3000/api/repos
+Content-Type: application/json
+
+{
+  "name": "repo de test",
+  "url": "https://github.com/new-repo",
+  "statusId": 1,
+  "langIds": [1, 2, 3]  
+}
+
+###
+
+
+# Requête PUT pour modifier un dépôt existant
+PUT http://localhost:3000/api/repos/8ea6da82-bf77-4726-a6f2-5669c461fd61
+Content-Type: application/json
+
+{
+  "statusId": "1",
+  "name": "mon-portfolio-v4",
+  "url": "https://github.com/alexandreg67/mon-portfolio-v2"
+}
+
+###
+
+# Requête DELETE pour supprimer un dépôt existant
+DELETE http://localhost:3000/api/repos/8ea6da82-bf77-4726-a6f2-5669c461fd61
+
+# Requête GET pour récupérer toutes les langues
+GET http://localhost:3000/api/langs
+Accept: application/json
+
+###
+
+
