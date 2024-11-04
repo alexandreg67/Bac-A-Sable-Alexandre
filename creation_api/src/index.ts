@@ -34,7 +34,7 @@ import cors from "cors";
 
   app.use(
     cors({
-      origin: "*", // Autoriser toutes les origines
+      origin: "https://fluffy-travesseiro-ae188a.netlify.app/",
     })
   );
 
